@@ -2,6 +2,7 @@ package com.wark.myapplication;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -18,7 +19,7 @@ public class StepCheckService extends Service implements SensorEventListener {
     private float lastX;
     private float lastY;
     private float lastZ;
-
+    int step;
     private float x, y, z;
     private static final int SHAKE_THRESHOLD = 800;
 
@@ -28,6 +29,11 @@ public class StepCheckService extends Service implements SensorEventListener {
     @Override
     public void onCreate() {
             super.onCreate();
+
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        int save =new Integer(pref.getString("step", ""));
+        step = new Integer(save);
+
         if(main.flag) {
             Log.i("onCreate", "IN");
             sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -61,7 +67,9 @@ public class StepCheckService extends Service implements SensorEventListener {
         } // end of if
     } // end of onDestroy
 
-
+public void getstep(){
+    Log.e("servicestep", String.valueOf(step));
+}
     @Override
     public void onSensorChanged(SensorEvent event) {
             Log.i("onSensorChanged", "IN");
@@ -84,13 +92,16 @@ public class StepCheckService extends Service implements SensorEventListener {
                         Intent myFilteredResponse = new Intent("make.a.yong.manbo");
 
 
-
-                        StepValue.Step = count++;
-                        String msg = StepValue.Step / 2 + "";
+                        step = count++;
+                        String msg = step / 2 + "";
                         myFilteredResponse.putExtra("stepService", msg);
-                        Log.e("step", String.valueOf(StepValue.Step));
+                        Log.e("step", String.valueOf(step));
                         sendBroadcast(myFilteredResponse);
 
+                        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putString("step", String.valueOf(step));
+                        editor.commit();
                     } // end of if
 
                     lastX = event.values[0];

@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-        final String save =pref.getString("service", "");
+        final String save =pref.getString("step", "");
         Deco(save);
         PlayingReceiver play = new PlayingReceiver();
         SeriesItem seriesItem1 = new SeriesItem.Builder(Color.parseColor("#FFE2E2E2")).setRange(0, 10000, 10000).build();
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         Notification.Builder builder = new Notification.Builder(getApplicationContext());
-        intent1.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);//현재 액티비티를 최상으로 올리고, 최상의 액티비티를 제외한 모든 액티비티를
+        intent1.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);//현재 액티비티를 최상으로 올리고, 최상의 액티비티를 제외한 모든 액티비티를 제거
 
         PendingIntent pendingNotificationIntent = PendingIntent.getActivity(MainActivity.this, 0, intent1, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -113,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
                 .setContentIntent(pendingNotificationIntent)
                 .setAutoCancel(true)
                 .setOngoing(true);
-
         notificationManager.notify(1, builder.build()); // Notification send
 
 
@@ -135,8 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void Deco(String a) {
-        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
+
         int cal = (int) ((((3.7103 + 0.2678*60) +(0.0359*70*60*0.0006213))*2)*60);
         if(Discrimination==1) {
             decoText.setText(a + "걸음");
@@ -173,12 +171,18 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
+
             Log.i("PlayignReceiver", "IN");
                 serviceData = intent.getStringExtra("stepService");
             Toast.makeText(getApplicationContext(), "manbo", Toast.LENGTH_SHORT).show();
             deta = serviceData;
 
-           Deco(serviceData);
+            SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putString("step",serviceData);
+            editor.commit();
+
+            Deco(serviceData);
            notice(serviceData);
         }
     }
