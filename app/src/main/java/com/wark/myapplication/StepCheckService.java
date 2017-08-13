@@ -2,7 +2,6 @@ package com.wark.myapplication;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,7 +12,6 @@ import android.util.Log;
 public class StepCheckService extends Service implements SensorEventListener {
 
     MainActivity main = new MainActivity();
-
     int count = StepValue.Step;
     private long lastTime;
     private float speed;
@@ -63,16 +61,9 @@ public class StepCheckService extends Service implements SensorEventListener {
         } // end of if
     } // end of onDestroy
 
-    private void getPreferences(){
-        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-        pref.getString("service", "");
-        pref.getString("step", "");
-    }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        getPreferences();
-        Log.e("adsfsencer", String.valueOf(main.flag));
             Log.i("onSensorChanged", "IN");
         if(main.flag) {
 
@@ -94,16 +85,12 @@ public class StepCheckService extends Service implements SensorEventListener {
                         Log.i("onSensorChanged_IF", "SECOND_IF_IN");
                         Intent myFilteredResponse = new Intent("make.a.yong.manbo");
 
-                        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = pref.edit();
-                        editor.putString("service", String.valueOf(StepValue.Step));
-                        editor.commit();
 
 
                         StepValue.Step = count++;
                         String msg = StepValue.Step / 2 + "";
                         myFilteredResponse.putExtra("stepService", msg);
-
+                        Log.e("step", String.valueOf(StepValue.Step));
                         sendBroadcast(myFilteredResponse);
 
                     } // end of if

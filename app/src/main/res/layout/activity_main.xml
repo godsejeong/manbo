@@ -22,7 +22,7 @@
             android:typeface="sans"
             android:textSize="20sp"
             android:id="@+id/decotext"
-            android:text="0걸음"
+            android:text="0걸음   "
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"/>

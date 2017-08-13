@@ -10,13 +10,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,7 +56,17 @@ public class MainActivity extends AppCompatActivity {
         decoText_1 = (TextView) findViewById(R.id.decotext_1);
         decoText = (TextView) findViewById(R.id.decotext);
         artview = (DecoView) findViewById(R.id.dynamicArcView);
-        getPreferences();
+
+        try {
+            IntentFilter mainFilter = new IntentFilter("make.a.yong.manbo");
+            registerReceiver(receiver, mainFilter);
+            startService(manboService);
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        Deco(pref.getString("service", ""));
         PlayingReceiver play = new PlayingReceiver();
         SeriesItem seriesItem1 = new SeriesItem.Builder(Color.parseColor("#FFE2E2E2")).setRange(0, 10000, 10000).build();
         int backseries = artview.addSeries(seriesItem1);
@@ -68,14 +75,8 @@ public class MainActivity extends AppCompatActivity {
         // 이벤트
         artview.addEvent(new DecoEvent.Builder(10000).setIndex(backseries).build());
 
-
     }
 
-    private void getPreferences(){
-        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-        pref.getString("service", "");
-        pref.getString("step", "");
-    }
 
     public void notice(String a) {
         NotificationManager notificationManager = (NotificationManager) MainActivity.this.getSystemService(MainActivity.this.NOTIFICATION_SERVICE);
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void Deco(String a) {
+        decoText.setText(a+"걸음");
         final SeriesItem seriesItem = new SeriesItem.Builder(Color.argb(255, 229, 10, 1)).setRange(0, 10000, 0)
 //                  .setSeriesLabel(new SeriesLabel.Builder("%.0f%%")//값 표시
                 .build();
@@ -142,12 +144,13 @@ public class MainActivity extends AppCompatActivity {
 
 
     class PlayingReceiver extends BroadcastReceiver {
+
         String serviceData;
         @Override
         public void onReceive(Context context, Intent intent) {
+
             Log.i("PlayignReceiver", "IN");
                 serviceData = intent.getStringExtra("stepService");
-                decoText.setText(serviceData+"걸음");
             Toast.makeText(getApplicationContext(), "manbo", Toast.LENGTH_SHORT).show();
             deta = serviceData;
             SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
@@ -166,43 +169,43 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        Drawable d = null;
-        switch (id) {
-            case R.id.play:
-                Log.e("asfd", String.valueOf(flag));
-                if (flag) {
-                    try {
-                        Log.e("aasdf", "ture");
-                        IntentFilter mainFilter = new IntentFilter("make.a.yong.manbo");
-                        item.setTitle("Stop");
-                        d = getResources().getDrawable(R.drawable.stop);
-                        registerReceiver(receiver, mainFilter);
-                        startService(manboService);
-                    } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                } else {
-
-                    try {
-                        unregisterReceiver(receiver);
-                        Log.e("aasdf", "flase");
-                        item.setTitle("Start");
-                        d = getResources().getDrawable(R.drawable.play);
-                    } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                flag = !flag;
-                d.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-                item.setIcon(d);
-                return true;
-        }
-                return flag;
-        }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//        Drawable d = null;
+//        switch (id) {
+//            case R.id.play:
+//                Log.e("asfd", String.valueOf(flag));
+//                if (flag) {
+//                    try {
+//                        Log.e("aasdf", "ture");
+//                        IntentFilter mainFilter = new IntentFilter("make.a.yong.manbo");
+//                        item.setTitle("Stop");
+//                        d = getResources().getDrawable(R.drawable.stop);
+//                        registerReceiver(receiver, mainFilter);
+//                        startService(manboService);
+//                    } catch (Exception e) {
+//                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+//                    }
+//                } else {
+//
+//                    try {
+//                        unregisterReceiver(receiver);
+//                        Log.e("aasdf", "flase");
+//                        item.setTitle("Start");
+//                        d = getResources().getDrawable(R.drawable.play);
+//                    } catch (Exception e) {
+//                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+//                    }
+//                }
+//
+//                flag = !flag;
+//                d.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+//                item.setIcon(d);
+//                return true;
+//        }
+//                return flag;
+//        }
 
 }
 
