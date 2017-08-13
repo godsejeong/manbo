@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">manbo</string>
     <string name="goal">목표</string>
     <string name="setting_goal">목표 설정</string>
     <string name="goal_summary">현재 목표: %,d 걸음</string>

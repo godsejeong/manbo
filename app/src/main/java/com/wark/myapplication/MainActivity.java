@@ -1,6 +1,5 @@
 package com.wark.myapplication;
 
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,8 +12,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.widget.ImageView;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,14 +24,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String GOAL = "10000";
     Intent manboService;
     BroadcastReceiver receiver;
-    NotificationManager nMN;
-    AlertDialog.Builder builder;
 
     private boolean isServiceOn = true;
 
-    int t;
+    int Discrimination=1;//판별
     DecoView artview;
-    ImageView imageView;
     public static final int[] CHART_RED = {Color.rgb(229, 10, 1)};
     public static final int[] CHART_GREAE = {Color.rgb(223, 223, 223)};
 
@@ -66,7 +61,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-        Deco(pref.getString("service", ""));
+        final String save =pref.getString("service", "");
+        Deco(save);
         PlayingReceiver play = new PlayingReceiver();
         SeriesItem seriesItem1 = new SeriesItem.Builder(Color.parseColor("#FFE2E2E2")).setRange(0, 10000, 10000).build();
         int backseries = artview.addSeries(seriesItem1);
@@ -75,6 +71,25 @@ public class MainActivity extends AppCompatActivity {
         // 이벤트
         artview.addEvent(new DecoEvent.Builder(10000).setIndex(backseries).build());
 
+        artview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch (Discrimination){
+                    case 1:
+                        Discrimination=2;
+                        Deco(save);
+                        break;
+                    case 2:
+                        Discrimination=3;
+                        Deco(save);
+                        break;
+                    case 3:
+                        Discrimination=1;
+                        Deco(save);
+                        break;
+                }
+            }
+        });
     }
 
 
@@ -93,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 .setWhen(System.currentTimeMillis())
                 .setNumber(1)
                 .setContentTitle("만보기")
-                .setContentText("현제 걸음 수 : " + a)
+                .setContentText(a + "걸음" + "  "+ (float)((((170 -100) * new Integer(a))/100))/1000 + "Km" + "  "+ new Integer((int) (((((170 -100) * new Integer(a))/100)) * (((((3.7103 + 0.2678*60) + 0.359*70*60*0.0006213))*2)*60) * 0.0006213)) + "calorie")
                 .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
                 .setContentIntent(pendingNotificationIntent)
                 .setAutoCancel(true)
@@ -120,8 +135,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void Deco(String a) {
-        decoText.setText(a+"걸음");
-        final SeriesItem seriesItem = new SeriesItem.Builder(Color.argb(255, 229, 10, 1)).setRange(0, 10000, 0)
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        int cal = (int) (((((3.7103 + 0.2678*60) + 0.359*70*60*0.0006213))*2)*60);
+        if(Discrimination==1) {
+            decoText.setText(a + "걸음");
+        }
+        else if(Discrimination==2) {
+            decoText.setText((float)((((170 -100) * new Integer(a))/100))/1000 + "Km");
+        }else if(Discrimination==3) {
+            decoText.setText(new Integer((int) (((((170 -100) * new Integer(a))/100)) * cal * 0.0006213))+ "calorie");//칼로리
+        }final SeriesItem seriesItem = new SeriesItem.Builder(Color.argb(255, 229, 10, 1)).setRange(0, 10000, 0)
 //                  .setSeriesLabel(new SeriesLabel.Builder("%.0f%%")//값 표시
                 .build();
         //값변경
@@ -153,59 +177,11 @@ public class MainActivity extends AppCompatActivity {
                 serviceData = intent.getStringExtra("stepService");
             Toast.makeText(getApplicationContext(), "manbo", Toast.LENGTH_SHORT).show();
             deta = serviceData;
-            SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putString("service",serviceData);
-            editor.commit();
 
            Deco(serviceData);
            notice(serviceData);
         }
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//        Drawable d = null;
-//        switch (id) {
-//            case R.id.play:
-//                Log.e("asfd", String.valueOf(flag));
-//                if (flag) {
-//                    try {
-//                        Log.e("aasdf", "ture");
-//                        IntentFilter mainFilter = new IntentFilter("make.a.yong.manbo");
-//                        item.setTitle("Stop");
-//                        d = getResources().getDrawable(R.drawable.stop);
-//                        registerReceiver(receiver, mainFilter);
-//                        startService(manboService);
-//                    } catch (Exception e) {
-//                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-//                    }
-//                } else {
-//
-//                    try {
-//                        unregisterReceiver(receiver);
-//                        Log.e("aasdf", "flase");
-//                        item.setTitle("Start");
-//                        d = getResources().getDrawable(R.drawable.play);
-//                    } catch (Exception e) {
-//                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-//                    }
-//                }
-//
-//                flag = !flag;
-//                d.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-//                item.setIcon(d);
-//                return true;
-//        }
-//                return flag;
-//        }
 
 }
 

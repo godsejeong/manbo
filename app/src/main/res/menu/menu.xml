@@ -8,7 +8,7 @@
     app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/goal"
-        android:title="목표 설정"
+        android:id="@+id/gps"
+        android:title="이동 경로"
         />
 </menu>
