@@ -65,8 +65,6 @@ public class StepCheckService extends Service implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
             Log.i("onSensorChanged", "IN");
-        if(main.flag) {
-
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 long currentTime = System.currentTimeMillis();
                 long gabOfTime = (currentTime - lastTime);
@@ -98,8 +96,7 @@ public class StepCheckService extends Service implements SensorEventListener {
                     lastX = event.values[0];
                     lastY = event.values[1];
                     lastZ = event.values[2];
-                    } // end of if
-                }
+                } // end of if
             } // end of if
         } // end of onSensorChanged
 
@@ -107,7 +104,6 @@ public class StepCheckService extends Service implements SensorEventListener {
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
-
     @Override
     public IBinder onBind(Intent intent) {
         return null;

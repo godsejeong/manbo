@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     public void Deco(String a) {
         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
-        int cal = (int) (((((3.7103 + 0.2678*60) + 0.359*70*60*0.0006213))*2)*60);
+        int cal = (int) ((((3.7103 + 0.2678*60) +(0.0359*70*60*0.0006213))*2)*60);
         if(Discrimination==1) {
             decoText.setText(a + "걸음");
         }
